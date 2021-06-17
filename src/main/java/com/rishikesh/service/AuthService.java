@@ -5,12 +5,9 @@ import java.util.UUID;
 
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.rishikesh.Repository.UserRepository;
-import com.rishikesh.Repository.VerificationTokenRepository;
 import com.rishikesh.dto.RegisterRequest;
 import com.rishikesh.model.User;
 import com.rishikesh.model.VerificationToken;
@@ -22,8 +19,8 @@ import lombok.AllArgsConstructor;
 public class AuthService {
 
 	private final PasswordEncoder passwordEncoder;
-	private final UserRepository userRepository;
-	private final VerificationTokenRepository verificationTokenRepository;
+	private final com.rishikesh.repository.UserRepository userRepository;
+	private final com.rishikesh.repository.VerificationTokenRepository verificationTokenRepository;
 
 	@Transactional
 	public void signup(RegisterRequest registerRequest) {
