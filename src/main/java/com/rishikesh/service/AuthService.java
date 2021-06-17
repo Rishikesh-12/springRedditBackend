@@ -9,8 +9,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.rishikesh.dto.RegisterRequest;
+import com.rishikesh.model.NotificationEmail;
 import com.rishikesh.model.User;
 import com.rishikesh.model.VerificationToken;
+import com.rishikesh.repository.UserRepository;
+import com.rishikesh.repository.VerificationTokenRepository;
+import com.rishikesh.service.MailService;
 
 import lombok.AllArgsConstructor;
 
@@ -19,8 +23,9 @@ import lombok.AllArgsConstructor;
 public class AuthService {
 
 	private final PasswordEncoder passwordEncoder;
-	private final com.rishikesh.repository.UserRepository userRepository;
-	private final com.rishikesh.repository.VerificationTokenRepository verificationTokenRepository;
+	private final UserRepository userRepository;
+	private final VerificationTokenRepository verificationTokenRepository;
+	private final MailService mailService;
 
 	@Transactional
 	public void signup(RegisterRequest registerRequest) {
@@ -32,6 +37,9 @@ public class AuthService {
 		user.setCreated(Instant.now());
 		userRepository.save(user);
 		String token = generateVerificationToken(user);
+		mailService.sendMail(new NotificationEmail("Please Activate your Account", user.getEmail(),
+				"Thank you for signing up, please click on the below url to activate your account:\n http://localhost:8080/api/auth/accountverification/"
+						+ token));
 	}
 
 	private String generateVerificationToken(User user) {
