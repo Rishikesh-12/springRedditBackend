@@ -17,11 +17,10 @@ import com.rishikesh.model.User;
 import com.rishikesh.model.VerificationToken;
 import com.rishikesh.repository.UserRepository;
 import com.rishikesh.repository.VerificationTokenRepository;
-import com.sun.istack.NotNull;
 
-import jdk.internal.org.jline.utils.Log;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -67,7 +66,7 @@ public class AuthService {
 		@NotBlank(message="Username is required") String userName = verificationToken.getUser().getUsername();
 		User user = userRepository.findByUsername(userName).orElseThrow(() -> new SpringRedditException("User not found"));
 		user.setEnabled(true);
-		Log.info("User Enabled");
+		log.info("User Enabled");
 		userRepository.save(user);
 	}
 }
