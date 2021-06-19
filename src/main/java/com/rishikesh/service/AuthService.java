@@ -1,23 +1,28 @@
 package com.rishikesh.service;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.rishikesh.dto.RegisterRequest;
+import com.rishikesh.exception.SpringRedditException;
 import com.rishikesh.model.NotificationEmail;
 import com.rishikesh.model.User;
 import com.rishikesh.model.VerificationToken;
 import com.rishikesh.repository.UserRepository;
 import com.rishikesh.repository.VerificationTokenRepository;
-import com.rishikesh.service.MailService;
+import com.sun.istack.NotNull;
 
+import jdk.internal.org.jline.utils.Log;
 import lombok.AllArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @AllArgsConstructor
 public class AuthService {
@@ -49,5 +54,20 @@ public class AuthService {
 		verificationToken.setUser(user);
 		verificationTokenRepository.save(verificationToken);
 		return token;
+	}
+
+	public void verifyAccount(String token) {
+		Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+		verificationToken.orElseThrow(() -> new SpringRedditException("Token is invalid"));
+		fetchUserandEnable(verificationToken.get());
+	}
+
+	@Transactional
+	private void fetchUserandEnable(VerificationToken verificationToken) {
+		@NotBlank(message="Username is required") String userName = verificationToken.getUser().getUsername();
+		User user = userRepository.findByUsername(userName).orElseThrow(() -> new SpringRedditException("User not found"));
+		user.setEnabled(true);
+		Log.info("User Enabled");
+		userRepository.save(user);
 	}
 }
